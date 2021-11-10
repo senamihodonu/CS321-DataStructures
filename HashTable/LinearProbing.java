@@ -26,4 +26,5 @@ public class LinearProbing<T> extends HashTable<T> {
 	public int linearProbing(T hashObject) {
 		return super.hashInsert(hashObject);
 	}
+
 }

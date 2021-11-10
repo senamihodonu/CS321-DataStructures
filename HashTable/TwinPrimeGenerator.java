@@ -1,5 +1,6 @@
 /**
  * Class for generating smallest twin primes in a given range.
+ * 
  * @author Senami H.
  */
 public class TwinPrimeGenerator {
@@ -9,6 +10,7 @@ public class TwinPrimeGenerator {
 
 	/**
 	 * Smallest twin prime generation within a range
+	 * 
 	 * @param min -- minimum value of range
 	 * @param max -- maximum value of range
 	 */
@@ -18,7 +20,7 @@ public class TwinPrimeGenerator {
 
 		while (flag == false && (i <= max)) {
 			if (isPrime(i) && isPrime(i - 2)) {
-				if(i >= min) {
+				if (i >= min) {
 					tableSize = i;
 					flag = true;
 				}
@@ -27,9 +29,9 @@ public class TwinPrimeGenerator {
 		}
 	}
 
-
 	/**
 	 * Check if a given integer is prime
+	 * 
 	 * @param number
 	 * @return true, if integer is prime
 	 */
@@ -46,22 +48,25 @@ public class TwinPrimeGenerator {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Returns Twin prime table size within a given range
-	 * @return
+	 * 
+	 * @return tableSize
 	 */
 	public int getTwinPrimeTableSize() {
 		return tableSize;
 	}
-	
+
 	/**
 	 * toString method to print out the smallest twin primes generated
+	 * 
 	 * @return generated twin primes
 	 */
 	public String toString() {
-		return "The smallest twin primes: m = " + tableSize + ", m - 2 = " + (tableSize-2);	
+		return "The smallest twin primes: m = " + tableSize + ", m - 2 = " + (tableSize - 2);
 	}
-	
+
 }
 
+//https://www.geeksforgeeks.org/java-program-to-check-if-a-number-is-prime-or-not/

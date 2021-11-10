@@ -12,7 +12,7 @@ public class HashObject<T> {
 	
 	/**
 	 * HashObject constructor
-	 * @param Object
+	 * @param key
 	 */
 	public HashObject(T key) {
 		this.frequencyCount = 0;
@@ -22,7 +22,7 @@ public class HashObject<T> {
 	
 	/**
 	 * Return the key of an object
-	 * @return the key
+	 * @return key
 	 */
 	public T getKey() {
 		return key;	
@@ -30,15 +30,14 @@ public class HashObject<T> {
 	
 	/**
 	 * Returns the number of probes for the objects to be inserted
-	 * @return number of probes
+	 * @return probeCount
 	 */
 	public int getProbeCount() {
 		return probeCount;
 	}
 	
 	/**
-	 * increments the probe count
-	 * @return probeCount + 1
+	 * Sets the probe count
 	 */
 	public void setProbeCount(int probeCount) {
 		this.probeCount = probeCount;
@@ -47,7 +46,7 @@ public class HashObject<T> {
 	
 	/**
 	 * Returns the frequency count of an object in the list
-	 * @return the frequency count
+	 * @return frequencyCount
 	 */
 	public int getFrequencyCount() {
 		return frequencyCount;
@@ -61,15 +60,19 @@ public class HashObject<T> {
 		return frequencyCount++;
 	}
 	
+	/**
+	 * String representation of the inserted key, the frequency count
+	 * and probeCount
+	 */
 	@Override
 	public String toString() {
-		return key + " " + frequencyCount + " " + probeCount;	
+		return key + " " + frequencyCount + " " + probeCount ;	
 	}
 	
 	/**
 	 * This method checks if some other Object passed to it as an 
 	 * argument is equal to the Object on which it is invoked.
-	 * @return
+	 * @return true if equal, else returns false
 	 */
 	@Override
 	public boolean equals(Object value){

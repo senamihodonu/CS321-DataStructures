@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.Random;
 
 /**
+ * HashTable abstract class of HashObject for linear probing and for double
+ * hashing. Contains the common hash table functionalities.
  * 
  * @author Senami H.
  * @param <T>
@@ -13,23 +15,23 @@ public abstract class HashTable<T> {
 
 	/* Instance Variables */
 	protected T key; // keys to be inserted
-	protected int index;
-	protected int numProbes;
+	protected int index; // index at which key is inserted
+	protected int numProbes; // number of probes for a insertion
 	protected int numKeysInserted; // number of keys being inserted into a hash table.
 	protected int duplicates; // number of duplicates
 	protected int tableSize; // hash table size m.
-	protected HashObject<T>[] hashTable;
-	protected int hashOne; //primary hash value
-	protected int hashTwo; //secondary hash value
+	protected HashObject<T>[] hashTable; // array of HashObject
+	protected int hashOne; // primary hash value
+	protected int hashTwo; // secondary hash value
 	protected double loadFactor; // ratio of the number of keys to the table size
 	private final int RANGE_MAX = 96000; // maximum of given range
 	private final int RANGE_MIN = 95500; // minimum of given range
 	private TwinPrimeGenerator twinPrime = new TwinPrimeGenerator(RANGE_MIN, RANGE_MAX); // generates the table size
 	protected boolean doubleHashing = false; // flag to check if double hashing
 
-
 	/**
 	 * HashTable constructor
+	 * 
 	 * @param loadFactor
 	 */
 	@SuppressWarnings("unchecked")
@@ -44,7 +46,7 @@ public abstract class HashTable<T> {
 	 * Inserting n keys into a hash table of size m. The load factor defined to be
 	 * n/m. For open addressing n >= m, which implies that 0 <= load factor <= 1.
 	 * 
-	 * @return load
+	 * @return loadFactor
 	 */
 	public double getLoadFactor() {
 		return (double) numKeysInserted / tableSize;
@@ -52,6 +54,7 @@ public abstract class HashTable<T> {
 
 	/**
 	 * Returns the number of non duplicated inserts
+	 * 
 	 * @return numKeysInserted
 	 */
 	public int getNumOfInsert() {
@@ -59,9 +62,9 @@ public abstract class HashTable<T> {
 	}
 
 	/**
-	 * Returns the total number of non duplicated inserts
-   * including duplicates
-	 * @return
+	 * Returns the total of non duplicated inserts and duplicates
+	 * 
+	 * @return totalElements
 	 */
 	public int getTotalElements() {
 		return numKeysInserted + duplicates;
@@ -69,7 +72,8 @@ public abstract class HashTable<T> {
 
 	/**
 	 * Returns the hash table size
-	 * @return 
+	 * 
+	 * @return tableSize
 	 */
 	public int getSize() {
 		return tableSize;
@@ -77,7 +81,7 @@ public abstract class HashTable<T> {
 
 	/**
 	 * Computation of the primary hash value
- 	 * 
+	 * 
 	 * @return hashOne -- primary hash value
 	 */
 	public int getHashOne(T key) {
@@ -94,6 +98,8 @@ public abstract class HashTable<T> {
 	}
 
 	/**
+	 * Returns number of probes
+	 * 
 	 * @return the numProbes
 	 */
 	public int getNumProbes() {
@@ -101,15 +107,16 @@ public abstract class HashTable<T> {
 	}
 
 	/**
-   * Average number of probes
-	 * @return average number of probes
+	 * Returns the average number of probes
+	 * 
+	 * @return aveNumProbes
 	 */
 	public double avgNumProbes() {
 		return (double) numProbes / numKeysInserted;
 	}
 
 	/**
-	 * Clears the hash table
+	 * Clears all the content of hash table
 	 */
 	public void clear() {
 		for (int i = 0; i < hashTable.length; i++) {
@@ -119,8 +126,8 @@ public abstract class HashTable<T> {
 	}
 
 	/**
-	 * Helper function to ensure the mod operation in the probing 
-   * calculation always returns positive integers.
+	 * Helper function to ensure the mod operation in the probing calculation always
+	 * returns positive integers.
 	 * 
 	 * @param dividend
 	 * @param divisor
@@ -134,12 +141,18 @@ public abstract class HashTable<T> {
 	}
 
 	/**
-	 * @return the duplicates
+	 * The number of duplicates
+	 * 
+	 * @return duplicates
 	 */
 	public int getDuplicates() {
 		return duplicates;
 	}
 
+	/**
+	 * Returns the string representation of the number of duplicates and the number
+	 * of probes
+	 */
 	@Override
 	public String toString() {
 		return getDuplicates() + " " + getNumProbes();
@@ -148,7 +161,7 @@ public abstract class HashTable<T> {
 	/**
 	 * HASH-INSERT(T,k) function of the form h(k,i) = (h1(k) + i*h2(k))) mod m
 	 * 
-	 * @param key -
+	 * @param index
 	 */
 	@SuppressWarnings("null")
 	public int hashInsert(T hashObject) {
@@ -183,9 +196,10 @@ public abstract class HashTable<T> {
 		}
 		return (Integer) null;
 	}
-	
+
 	/**
 	 * File dump method
+	 * 
 	 * @param fileName
 	 * @throws FileNotFoundException
 	 */

@@ -19,16 +19,19 @@ public class HashTableTest {
 	private static String dataSource;
 	static DecimalFormat df = new DecimalFormat("#.##");
 	static DecimalFormat df2 = new DecimalFormat("#.####");
-	private final static int INITIAL_CAPACITY = 100; // starting capacity of debugArray
-	private static Object[] debugArray = new Object[INITIAL_CAPACITY]; // array used in debug level 2
 	private static int size = 0; // array size used in debug level 2
 	private static LinearProbing<Object> linearP = new LinearProbing<Object>(loadFactor);
 	private static DoubleHashing<Object> doubleH = new DoubleHashing<Object>(loadFactor);
-	private static double[] alpha = {0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99};
 	private static Object object;
 	private static int linearIndex;
 	private static int doubleIndex;
+	private static Object[] debugArray = new Object[linearP.getSize()]; // array used in debug level 2
+	private static int seed = 1000000;
 
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		if (args.length < 2 || args.length > 3) {
 			showUsage();
@@ -43,13 +46,11 @@ public class HashTableTest {
 		// check debug level
 		if (args.length == 3 && args[2].equals("0") || args.length == 2) {
 			debug = 0;
-      System.out.println("\n");
 		} else if (args.length == 3 && args[2].equals("1")) {
 			debug = 1;
-      System.out.println("\n");
 		} else if (args.length == 3 && args[2].equals("2")) {
 			debug = 2;
-			System.out.println("\nPrinting the elements...\n");
+			System.out.println("Printing the elements...\n");
 		} else {
 			showUsage();
 		}
@@ -92,14 +93,10 @@ public class HashTableTest {
 
 		while (doubleH.getLoadFactor() < loadFactor) {
 			Random rand = new Random();
-			int randInt = Math.abs(rand.nextInt(1000000));
+			int randInt = Math.abs(rand.nextInt(seed));
 			object = randInt;
-			linearP.linearProbing(randInt);
-			doubleH.doubleHashingInsert(randInt);
-			ensureCapacity();
-			debugArray[size] = randInt;
-			size++;
-			
+			insertOperation();
+
 		}
 		debugLevel();
 	}
@@ -114,14 +111,11 @@ public class HashTableTest {
 				"HashtableTest: Twin prime table size found in the range [95500..96000]: " + linearP.getSize() + "\n");
 		System.out.println("HashtableTest: Data source type --> " + dataSource + "\n");
 
-		while (linearP.getLoadFactor() < loadFactor) {
+		while (linearP.getLoadFactor() <= loadFactor) {
 			long systemClock = System.currentTimeMillis();
-			linearP.linearProbing(systemClock);
-			doubleH.doubleHashingInsert(systemClock);
-			ensureCapacity();
-			debugArray[size] = systemClock;
-			size++;
-			
+			object = systemClock;
+			insertOperation();
+
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
@@ -148,11 +142,8 @@ public class HashTableTest {
 			String word;
 
 			while (((word = br.readLine()) != null) && doubleH.getLoadFactor() < loadFactor) {
-				int linearIndex = linearP.linearProbing(word);
-				int doubleIndex = doubleH.doubleHashingInsert(word);
-				ensureCapacity();
-				debugArray[size] = word;
-				size++;
+				object = word;
+				insertOperation();
 
 			}
 			br.close();
@@ -183,74 +174,97 @@ public class HashTableTest {
 			debugArray = Arrays.copyOf(debugArray, debugArray.length * 2);
 		}
 	}
-	
+
+	/**
+	 * Hash insert method calls
+	 */
+	private static void insertOperation() {
+		linearIndex = linearP.linearProbing(object);
+		doubleIndex = doubleH.doubleHashingInsert(object);
+		ensureCapacity();
+		debugArray[size] = object;
+		size++;
+	}
 
 	/**
 	 * print summary of experiment on the console
 	 */
-	private static void statSummary(int getTotalElements, int getDuplicates, double loadFactor, double avgNumProbes) {
-		System.out.println(
-				"HashtableTest: Input " + getTotalElements + " elements, of which " + getDuplicates + " duplicates");
-		System.out.println("HashtableTest: load factor = " + df.format(loadFactor) + ", Avg. no. of probes "
-				+ df2.format(avgNumProbes) + "\n");
+	private static void statSummary() {
+		System.out.println("HashtableTest: Using Linear Hashing....");
+		System.out.println("HashtableTest: Input " + linearP.getTotalElements() + " elements, of which "
+				+ linearP.getDuplicates() + " duplicates");
+		System.out.println("HashtableTest: load factor = " + df.format(linearP.getLoadFactor())
+				+ ", Avg. no. of probes " + df2.format(linearP.avgNumProbes()) + "\n");
+
+		System.out.println("HashtableTest: Using Double Hashing....");
+		System.out.println("HashtableTest: Input " + doubleH.getTotalElements() + " elements, of which "
+				+ doubleH.getDuplicates() + " duplicates");
+		System.out.println("HashtableTest: load factor = " + df.format(doubleH.getLoadFactor())
+				+ ", Avg. no. of probes " + df2.format(doubleH.avgNumProbes()) + "\n");
 	}
 
 	/**
 	 * Debug levels for experiment
+	 * 
+	 * debug = 0: print summary of experiment on the console
+	 * 
+	 * debug = 1: print summary of experiment on the console and also save the hash
+	 * tables with number of duplicates and number of probes into two files
+	 * linear-dump.txt and double-dump.txt.
+	 * 
+	 * debug = 2: print element by element detailed output to help us debug and
+	 * trace the behavior of the code.
+	 * 
 	 */
 	private static void debugLevel() {
 		if (debug == 0) {
-			System.out.println("HashtableTest: Using Linear Hashing....");
-			statSummary(linearP.getTotalElements(), linearP.getDuplicates(), linearP.getLoadFactor(),
-					linearP.avgNumProbes());
-			System.out.println("HashtableTest: Using Double Hashing....");
-			statSummary(doubleH.getTotalElements(), doubleH.getDuplicates(), doubleH.getLoadFactor(),
-					doubleH.avgNumProbes());
-
+			statSummary();
 		}
 
-		/*
-		 * debug = 1: print summary of experiment on the console and also save the hash
-		 * tables with number of duplicates and number of probes into two files
-		 * linear-dump.txt and double-dump.txt.
-		 */
 		else if (debug == 1) {
-			System.out.println("HashtableTest: Using Linear Hashing....");
-			statSummary(linearP.getTotalElements(), linearP.getDuplicates(), linearP.getLoadFactor(),
-					linearP.avgNumProbes());
-			System.out.println("HashtableTest: Using Double Hashing....");
-			statSummary(doubleH.getTotalElements(), doubleH.getDuplicates(), doubleH.getLoadFactor(),
-					doubleH.avgNumProbes());
-
+			statSummary();
 			// saving the hash tables with number of duplicates and number
 			// of probes into two files linear-dump.txt and double-dump.txt.
 			try {
 				linearP.dump("linear-dump.txt");
 				doubleH.dump("double-dump.txt");
-				System.out.println("Dump complete...");
+
 			} catch (FileNotFoundException e) {
 				System.out.println("File name not found!");
 			}
 
 		}
-		
-		/*
-		 * debug = 2: print element by element detailed output to help us debug and
-		 * trace the behavior of the code.
-		 */
+
 		else if (debug == 2) {
-			
+
 			try {
-				Thread.sleep(1);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
+			// print element by element
 			for (int i = size; i >= 0; i--) {
-				System.out.println("insert [" + i + "]: " + debugArray[i]);
+				System.out.println("table[" + i + "]: " + debugArray[i]);
+
 			}
-			
+
 		}
 
 	}
+
+	/**
+	 * @return the linearIndex
+	 */
+	public static int getLinearIndex() {
+		return linearIndex;
+	}
+
+	/**
+	 * @return the doubleIndex
+	 */
+	public static int getDoubleIndex() {
+		return doubleIndex;
+	}
 }
+//https://www.programiz.com/java-programming/examples/round-number-decimal
